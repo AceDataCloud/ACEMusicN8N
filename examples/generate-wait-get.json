@@ -1,0 +1,162 @@
+{
+  "name": "ACE Music - submit once and query original task",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual",
+      "name": "Start",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "create",
+        "prompt": "A warm acoustic folk song about returning home",
+        "model": "acemusic-v1.1",
+        "custom": false,
+        "simplify": true
+      },
+      "id": "create",
+      "name": "Create once",
+      "type": "@acedatacloud/n8n-nodes-acemusic.aceMusic",
+      "typeVersion": 1,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "amount": 10,
+        "unit": "seconds"
+      },
+      "id": "wait",
+      "name": "Wait before query",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [480, 0],
+      "webhookId": "9200cbf4-a57f-43ae-ab56-d83c3987870e"
+    },
+    {
+      "parameters": {
+        "resource": "task",
+        "operation": "get",
+        "taskId": "={{ $('Create once').first().json.taskId }}",
+        "simplify": true
+      },
+      "id": "get",
+      "name": "Get original task",
+      "type": "@acedatacloud/n8n-nodes-acemusic.aceMusic",
+      "typeVersion": 1,
+      "position": [720, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "finished",
+              "leftValue": "={{ $json.finished }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if",
+      "name": "Task finished",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [960, 0]
+    },
+    {
+      "parameters": {
+        "content": "## Submit once, keep the original ID\nConfigure the same ACE Music credential on both ACE Music nodes. This workflow submits one paid task, waits 10 seconds, and queries its original task ID. A pending result loops only to Wait/Get, never to Create.\n\nUse the true output of Task finished to inspect successful/status/error/data before downloading. partial_failed is terminal and can retain one audio. Configure an execution timeout (example: 15 minutes). A timeout must be resumed with the original ID, not another Create.",
+        "height": 290,
+        "width": 650
+      },
+      "id": "note",
+      "name": "Recovery guidance",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [220, -330]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Create once",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create once": {
+      "main": [
+        [
+          {
+            "node": "Wait before query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait before query": {
+      "main": [
+        [
+          {
+            "node": "Get original task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get original task": {
+      "main": [
+        [
+          {
+            "node": "Task finished",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Task finished": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait before query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "executionTimeout": 900
+  },
+  "pinData": {},
+  "active": false,
+  "versionId": "089b6846-8a05-484c-b7cd-99992b7739b5",
+  "tags": []
+}
