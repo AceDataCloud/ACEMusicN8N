@@ -12,7 +12,7 @@ Acquire ACE Music or an authorized global application at [Ace Data Cloud](https:
 
 ## Use the node
 
-Choose Audio → Create. Use `acemusic-v1.1` or `acemusic-v1`. Idea mode accepts a prompt; Custom Lyrics uses Prompt as lyrics and requires Style; Title is optional. The create operation submits once and returns a task ID. Use Task → Get or Get Many after a Wait node, and continue querying that same ID until `finished` is true. Do not retry Create because a task is processing or a request times out.
+Choose Audio → Create. Use `acemusic-v1.1` or `acemusic-v1`. Idea mode accepts a prompt; Custom Lyrics uses Prompt as lyrics and requires both Style and Title. The create operation submits once and returns a task ID. Use Task → Get or Get Many after a Wait node, and continue querying that same ID until `finished` is true. Do not retry Create because a task is processing or a request times out.
 
 Lyrics → Create returns an editable title/text draft. It is a separately billed operation and may return a task ID for later retrieval if processing takes longer.
 

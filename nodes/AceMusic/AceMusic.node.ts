@@ -173,10 +173,10 @@ export class AceMusic implements INodeType {
             };
             if (custom) {
               body.lyric = prompt;
-              const title = String(
+              body.title = requiredText(
                 this.getNodeParameter("title", index, ""),
-              ).trim();
-              if (title) body.title = title;
+                "Title",
+              );
               body.style = requiredText(
                 this.getNodeParameter("style", index),
                 "Style",
