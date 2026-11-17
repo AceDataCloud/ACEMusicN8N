@@ -6,3 +6,7 @@ dist/
 .npmrc
 artifacts/
 *.tsbuildinfo
+
+# Official icon bytes are generated from the pinned CDN asset during build
+nodes/AceMusic/icon.png
+nodes/AceMusic/icon.dark.png

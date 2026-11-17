@@ -203,3 +203,13 @@ test("compiled credential icon resolves inside the package", () => {
   );
   assert.ok(fs.existsSync(icon));
 });
+
+test("build asset verifier rejects changed or non-PNG brand bytes", async () => {
+  const { createHash } = require("node:crypto");
+  const { verifyIcon } = await import("../scripts/fetch-brand-assets.mjs");
+  const data = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 1]);
+  const digest = createHash("sha256").update(data).digest("hex");
+  assert.deepEqual(verifyIcon(data, digest), data);
+  assert.throws(() => verifyIcon(data, "0".repeat(64)), /SHA256/);
+  assert.throws(() => verifyIcon(Buffer.from("html"), digest), /PNG/);
+});

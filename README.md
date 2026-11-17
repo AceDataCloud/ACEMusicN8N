@@ -31,3 +31,5 @@ npm pack --dry-run
 The production API depends on the companion worker, gateway and Backend changes. See [API documentation](https://platform.acedata.cloud/documents/acemusic).
 
 Import [the submit → Wait → get-original-task example](examples/generate-wait-get.json), set the ACE Music credential on both ACE Music nodes, and leave the Create node's automatic retry disabled. The pending branch loops only through Wait and Get. The example has a 15-minute execution timeout; retain the original task ID to resume a slow job.
+
+Official ACE Music icons are downloaded from the immutable CDN asset in `brand-assets.json` during `npm run build`, verified by SHA256, and packaged into `dist`. Brand binary files are not stored in source.
