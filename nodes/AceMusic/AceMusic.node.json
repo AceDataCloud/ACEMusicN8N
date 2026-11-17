@@ -1,0 +1,19 @@
+{
+  "node": "@acedatacloud/n8n-nodes-acemusic.aceMusic",
+  "nodeVersion": "1.0",
+  "codexVersion": "1.0",
+  "categories": ["Marketing & Content"],
+  "resources": {
+    "primaryDocumentation": [
+      {
+        "url": "https://github.com/AceDataCloud/ACEMusicN8N#use-the-node"
+      }
+    ],
+    "credentialDocumentation": [
+      {
+        "url": "https://github.com/AceDataCloud/ACEMusicN8N#credentials"
+      }
+    ]
+  },
+  "alias": ["ace music", "acemusic", "music generation"]
+}
