@@ -155,20 +155,27 @@ test("explicit processing group never becomes complete from nested success", () 
   assert.equal(result.status, "processing");
 });
 
-test("custom mode omits optional empty title", async () => {
-  const { ctx, calls } = context(
-    {
-      resource: "audio",
-      operation: "create",
-      prompt: "[Verse] Home",
-      model: "acemusic-v1.1",
-      custom: true,
-      style: "folk",
-    },
-    { task_id: "one" },
+test("custom mode requires a nonempty title before calling the API", async () => {
+  for (const title of [undefined, "", "   "]) {
+    const { ctx, calls } = context(
+      {
+        resource: "audio",
+        operation: "create",
+        prompt: "[Verse] Home",
+        model: "acemusic-v1.1",
+        custom: true,
+        title,
+        style: "folk",
+      },
+      { task_id: "one" },
+    );
+    await assert.rejects(new AceMusic().execute.call(ctx), /Title/);
+    assert.equal(calls.length, 0);
+  }
+  const field = new AceMusic().description.properties.find(
+    (property) => property.name === "title",
   );
-  await new AceMusic().execute.call(ctx);
-  assert.equal(calls[0].body.title, undefined);
+  assert.equal(field.required, true);
 });
 
 test("workflow pending branch queries original ID without resubmitting", () => {

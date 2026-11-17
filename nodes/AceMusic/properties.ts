@@ -173,6 +173,7 @@ export const properties: INodeProperties[] = [
     name: "title",
     type: "string",
     default: "",
+    required: true,
     displayOptions: {
       show: {
         resource: ["audio"],
