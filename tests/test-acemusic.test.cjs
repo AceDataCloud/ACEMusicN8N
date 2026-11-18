@@ -220,3 +220,75 @@ test("build asset verifier rejects changed or non-PNG brand bytes", async () => 
   assert.throws(() => verifyIcon(data, "0".repeat(64)), /SHA256/);
   assert.throws(() => verifyIcon(Buffer.from("html"), digest), /PNG/);
 });
+
+test("explicit upload imports once without generation fields", async () => {
+  const { ctx, calls } = context(
+    {
+      resource: "audio",
+      operation: "upload",
+      audioUrl: "https://example.com/owned.mp3",
+      uploadName: "Original",
+      anchorAudioId: "audio-anchor",
+    },
+    { task_id: "upload-one" },
+  );
+  const result = await new AceMusic().execute.call(ctx);
+  assert.equal(calls.length, 1);
+  assert.deepEqual(calls[0].body, {
+    action: "upload",
+    audio_url: "https://example.com/owned.mp3",
+    name: "Original",
+    audio_id: "audio-anchor",
+    async: true,
+  });
+  assert.equal(result[0][0].json.taskId, "upload-one");
+});
+
+test("reference operations map public IDs with no implicit import", async () => {
+  for (const [operation, reference] of [
+    ["cover", { audioId: "audio-a" }],
+    ["mashup", { mashupAudioIds: "audio-a, audio-b" }],
+  ]) {
+    const { ctx, calls } = context(
+      {
+        resource: "audio",
+        operation,
+        referenceLyric: "[Verse] Original",
+        referenceStyle: "Folk",
+        ...reference,
+      },
+      { task_id: "one" },
+    );
+    await new AceMusic().execute.call(ctx);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].body.action, operation);
+    assert.equal(calls[0].body.model, "acemusic-v1.1");
+    assert.equal(calls[0].body.audio_influence, 60);
+    assert.equal(calls[0].body.lyric, "[Verse] Original");
+    assert.equal(calls[0].body.title, undefined);
+    assert.equal(calls[0].body.custom, undefined);
+    if (operation === "cover") assert.equal(calls[0].body.audio_id, "audio-a");
+    else
+      assert.deepEqual(calls[0].body.mashup_audio_ids, ["audio-a", "audio-b"]);
+  }
+});
+
+test("invalid references never submit any request", async () => {
+  for (const parameters of [
+    { operation: "upload", audioUrl: "http://example.com/audio.mp3" },
+    { operation: "mashup", mashupAudioIds: "a,a" },
+    { operation: "cover", audioId: "a", audioInfluence: 0 },
+  ]) {
+    const { ctx, calls } = context(
+      {
+        resource: "audio",
+        referenceLyric: "Original",
+        referenceStyle: "Folk",
+        ...parameters,
+      },
+      {},
+    );
+    await assert.rejects(new AceMusic().execute.call(ctx));
+    assert.equal(calls.length, 0);
+  }
+});

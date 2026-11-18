@@ -119,22 +119,21 @@ export class AceMusic implements INodeType {
             ),
           );
         } else {
-          if (operation !== "create")
+          if (resource === "lyrics" && operation !== "create")
             throw new NodeOperationError(
               this.getNode(),
-              "Select a supported operation",
+              "Select a supported lyrics operation",
             );
-          const prompt = requiredText(
-            this.getNodeParameter("prompt", index),
-            "Prompt",
-          );
           if (resource === "lyrics") {
             const response = await request(
               this,
               "aceDataAceMusicApi",
               "/acemusic/lyrics",
               {
-                prompt,
+                prompt: requiredText(
+                  this.getNodeParameter("prompt", index),
+                  "Prompt",
+                ),
                 ...(String(
                   this.getNodeParameter("lyricsStyle", index, ""),
                 ).trim()
@@ -160,30 +159,114 @@ export class AceMusic implements INodeType {
               ),
             );
           } else if (resource === "audio") {
-            const custom = this.getNodeParameter(
-              "custom",
-              index,
-              false,
-            ) as boolean;
-            const body: IDataObject = {
-              action: "generate",
-              model: this.getNodeParameter("model", index) as string,
-              async: true,
-              custom,
-            };
-            if (custom) {
-              body.lyric = prompt;
-              body.title = requiredText(
-                this.getNodeParameter("title", index, ""),
-                "Title",
+            const body: IDataObject = { async: true };
+            if (operation === "create") {
+              const prompt = requiredText(
+                this.getNodeParameter("prompt", index),
+                "Prompt",
               );
-              body.style = requiredText(
-                this.getNodeParameter("style", index),
-                "Style",
+              const custom = this.getNodeParameter(
+                "custom",
+                index,
+                false,
+              ) as boolean;
+              Object.assign(body, {
+                action: "generate",
+                model: this.getNodeParameter("model", index),
+                custom,
+              });
+              if (custom) {
+                body.lyric = prompt;
+                body.title = requiredText(
+                  this.getNodeParameter("title", index),
+                  "Title",
+                );
+                body.style = requiredText(
+                  this.getNodeParameter("style", index),
+                  "Style",
+                );
+              } else body.prompt = prompt;
+            } else if (operation === "upload") {
+              const audioUrl = requiredText(
+                this.getNodeParameter("audioUrl", index),
+                "Audio URL",
               );
-            } else {
-              body.prompt = prompt;
-            }
+              const parsed = new URL(audioUrl);
+              if (
+                parsed.protocol !== "https:" ||
+                parsed.username ||
+                parsed.password
+              )
+                throw new NodeOperationError(
+                  this.getNode(),
+                  "A public HTTPS audio URL without credentials is required",
+                );
+              Object.assign(body, { action: "upload", audio_url: audioUrl });
+              const name = String(
+                this.getNodeParameter("uploadName", index, ""),
+              ).trim();
+              const anchor = String(
+                this.getNodeParameter("anchorAudioId", index, ""),
+              ).trim();
+              if (name) body.name = name;
+              if (anchor) body.audio_id = anchor;
+            } else if (["cover", "mashup"].includes(operation)) {
+              const influence = this.getNodeParameter(
+                "audioInfluence",
+                index,
+                60,
+              ) as number;
+              if (
+                !Number.isFinite(influence) ||
+                influence < 1 ||
+                influence > 100
+              )
+                throw new NodeOperationError(
+                  this.getNode(),
+                  "Audio Influence must be a number from 1 to 100",
+                );
+              Object.assign(body, {
+                action: operation,
+                model: "acemusic-v1.1",
+                lyric: requiredText(
+                  this.getNodeParameter("referenceLyric", index),
+                  "Lyrics",
+                ),
+                style: requiredText(
+                  this.getNodeParameter("referenceStyle", index),
+                  "Style",
+                ),
+                audio_influence: influence,
+              });
+              const title = String(
+                this.getNodeParameter("referenceTitle", index, ""),
+              ).trim();
+              if (title) body.title = title;
+              if (operation === "cover")
+                body.audio_id = requiredText(
+                  this.getNodeParameter("audioId", index),
+                  "Audio ID",
+                );
+              else {
+                const ids = requiredText(
+                  this.getNodeParameter("mashupAudioIds", index),
+                  "Audio IDs",
+                )
+                  .split(",")
+                  .map((id) => id.trim())
+                  .filter(Boolean);
+                if (ids.length !== 2 || new Set(ids).size !== 2)
+                  throw new NodeOperationError(
+                    this.getNode(),
+                    "Provide exactly two distinct platform audio IDs",
+                  );
+                body.mashup_audio_ids = ids;
+              }
+            } else
+              throw new NodeOperationError(
+                this.getNode(),
+                "Select a supported audio operation",
+              );
             const response = await request(
               this,
               "aceDataAceMusicApi",

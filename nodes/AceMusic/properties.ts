@@ -13,7 +13,7 @@ export const properties: INodeProperties[] = [
         value: "audio",
       },
       {
-        name: 'Lyric',
+        name: "Lyric",
         value: "lyrics",
       },
       {
@@ -39,6 +39,25 @@ export const properties: INodeProperties[] = [
         value: "create",
         description: "Create audio through AceDataCloud",
         action: "Create audio",
+      },
+      {
+        name: "Upload",
+        value: "upload",
+        description: "Import one reference track from a public HTTPS URL",
+        action: "Upload audio",
+      },
+      {
+        name: "Cover",
+        value: "cover",
+        description: "Create a cover using an owned platform audio ID",
+        action: "Create an audio cover",
+      },
+      {
+        name: "Mashup",
+        value: "mashup",
+        description:
+          "Create a mashup using two compatible owned platform audio IDs",
+        action: "Create an audio mashup",
       },
     ],
   },
@@ -128,6 +147,7 @@ export const properties: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ["audio", "lyrics"],
+        operation: ["create"],
       },
     },
     description:
@@ -144,13 +164,14 @@ export const properties: INodeProperties[] = [
         value: "acemusic-v1.1",
       },
       {
-        name: 'ACE Music V1',
+        name: "ACE Music V1",
         value: "acemusic-v1",
       },
     ],
     displayOptions: {
       show: {
         resource: ["audio"],
+        operation: ["create"],
       },
     },
     description: "The music model to use",
@@ -163,6 +184,7 @@ export const properties: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ["audio"],
+        operation: ["create"],
       },
     },
     description:
@@ -177,6 +199,7 @@ export const properties: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ["audio"],
+        operation: ["create"],
         custom: [true],
       },
     },
@@ -190,6 +213,7 @@ export const properties: INodeProperties[] = [
     displayOptions: {
       show: {
         resource: ["audio"],
+        operation: ["create"],
         custom: [true],
       },
     },
@@ -206,6 +230,98 @@ export const properties: INodeProperties[] = [
       },
     },
     description: "Optional musical style for the lyric draft",
+  },
+  {
+    displayName: "Audio URL",
+    name: "audioUrl",
+    type: "string",
+    default: "",
+    required: true,
+    displayOptions: { show: { resource: ["audio"], operation: ["upload"] } },
+    description:
+      "Public HTTPS audio URL you own or may use. This import is separately priced and does not create a cover.",
+  },
+  {
+    displayName: "Name",
+    name: "uploadName",
+    type: "string",
+    default: "",
+    displayOptions: { show: { resource: ["audio"], operation: ["upload"] } },
+    description: "Optional display name for the imported reference",
+  },
+  {
+    displayName: "Anchor Audio ID",
+    name: "anchorAudioId",
+    type: "string",
+    default: "",
+    displayOptions: { show: { resource: ["audio"], operation: ["upload"] } },
+    description:
+      "Optional successful caller-owned platform audio ID to anchor the import for reference use",
+  },
+  {
+    displayName: "Audio ID",
+    name: "audioId",
+    type: "string",
+    default: "",
+    required: true,
+    displayOptions: { show: { resource: ["audio"], operation: ["cover"] } },
+    description: "A successful caller-owned platform audio ID, not its task ID",
+  },
+  {
+    displayName: "Audio IDs",
+    name: "mashupAudioIds",
+    type: "string",
+    default: "",
+    required: true,
+    displayOptions: { show: { resource: ["audio"], operation: ["mashup"] } },
+    description:
+      "Exactly two distinct compatible caller-owned platform audio IDs, separated by a comma",
+  },
+  {
+    displayName: "Lyrics",
+    name: "referenceLyric",
+    type: "string",
+    default: "",
+    required: true,
+    typeOptions: { rows: 4 },
+    displayOptions: {
+      show: { resource: ["audio"], operation: ["cover", "mashup"] },
+    },
+    description:
+      "Lyrics for the new songs. Reference actions use ACE Music v1.1.",
+  },
+  {
+    displayName: "Style",
+    name: "referenceStyle",
+    type: "string",
+    default: "",
+    required: true,
+    displayOptions: {
+      show: { resource: ["audio"], operation: ["cover", "mashup"] },
+    },
+    description: "Musical style for the new songs",
+  },
+  {
+    displayName: "Title",
+    name: "referenceTitle",
+    type: "string",
+    default: "",
+    displayOptions: {
+      show: { resource: ["audio"], operation: ["cover", "mashup"] },
+    },
+    description: "Optional title for the new songs",
+  },
+  {
+    displayName: "Audio Influence",
+    name: "audioInfluence",
+    type: "number",
+    default: 60,
+    typeOptions: { minValue: 1, maxValue: 100 },
+    displayOptions: {
+      show: { resource: ["audio"], operation: ["cover", "mashup"] },
+    },
+    description:
+      "Reference influence from 1 to 100. Incompatible references are rejected without automatic upload or replacement.",
   },
   {
     displayName: "Simplify",
