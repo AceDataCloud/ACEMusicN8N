@@ -199,7 +199,7 @@ export class AceMusic implements INodeType {
               )
                 throw new NodeOperationError(
                   this.getNode(),
-                  "A public HTTPS audio URL without credentials is required",
+                  "A public HTTPS MP3 URL without credentials is required",
                 );
               Object.assign(body, { action: "upload", audio_url: audioUrl });
               const name = String(

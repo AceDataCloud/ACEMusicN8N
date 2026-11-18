@@ -43,7 +43,7 @@ export const properties: INodeProperties[] = [
       {
         name: "Upload",
         value: "upload",
-        description: "Import one reference track from a public HTTPS URL",
+        description: "Import one reference track from a public HTTPS MP3 URL",
         action: "Upload audio",
       },
       {
@@ -239,7 +239,7 @@ export const properties: INodeProperties[] = [
     required: true,
     displayOptions: { show: { resource: ["audio"], operation: ["upload"] } },
     description:
-      "Public HTTPS audio URL you own or may use. This import is separately priced and does not create a cover.",
+      "Public HTTPS MP3 URL you own or may use. This import is separately priced and does not create a cover.",
   },
   {
     displayName: "Name",
