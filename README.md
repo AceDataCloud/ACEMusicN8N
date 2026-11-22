@@ -1,10 +1,10 @@
 # ACE Music by Ace Data Cloud for n8n
 
-Create songs from an idea or custom lyrics, generate lyric drafts, and query the original task.
+Create songs from an idea or custom lyrics, generate lyric drafts, and query the original task. This package integrates only the ACE Music API, maintained by Ace Data Cloud, using one node and one credential. It does not bundle other model services.
 
 ## Installation
 
-After the first package release, install `@acedatacloud/n8n-nodes-acemusic` in n8n community nodes. This source PR does not imply npm publication or n8n Cloud verification.
+In a self-hosted n8n instance, open **Settings → Community Nodes → Install** and enter `@acedatacloud/n8n-nodes-acemusic`. The package is published on npm. n8n Cloud discovery requires separate verification by n8n; npm availability does not imply that approval.
 
 ## Credentials
 
@@ -12,7 +12,7 @@ Acquire ACE Music or an authorized global application at [Ace Data Cloud](https:
 
 ## Use the node
 
-Choose Audio → Create. Use `acemusic-v1.1` or `acemusic-v1`. Idea mode accepts a prompt; Custom Lyrics uses Prompt as lyrics and requires both Style and Title. The create operation submits once and returns a task ID. Use Task → Get or Get Many after a Wait node, and continue querying that same ID until `finished` is true. Do not retry Create because a task is processing or a request times out.
+Choose Audio → Create. The default model is `acemusic-v1.1`; choose **Additional Fields → Model** to use `acemusic-v1`. Idea mode accepts a prompt; Custom Lyrics uses Prompt as lyrics and requires both Style and Title. Optional lyric style, upload details, reference title and audio influence also appear under **Additional Fields** for the corresponding operation. Existing version 1 nodes keep their original fields and behavior; newly added nodes use version 1.1. The create operation submits once and returns a task ID. Use Task → Get or Get Many after a Wait node, and continue querying that same ID until `finished` is true. Do not retry Create because a task is processing or a request times out.
 
 Lyrics → Create returns an editable title/text draft. It is a separately billed operation and may return a task ID for later retrieval if processing takes longer.
 
@@ -30,7 +30,7 @@ npm test
 npm pack --dry-run
 ```
 
-The production API depends on the companion worker, gateway and Backend changes. See [API documentation](https://platform.acedata.cloud/documents/acemusic).
+See [API documentation](https://platform.acedata.cloud/documents/acemusic) and [current pricing](https://platform.acedata.cloud/models). Installation is free; generation, lyric creation and audio uploads use the application balance.
 
 Import [the submit → Wait → get-original-task example](examples/generate-wait-get.json), set the ACE Music credential on both ACE Music nodes, and leave the Create node's automatic retry disabled. The pending branch loops only through Wait and Get. The example has a 15-minute execution timeout; retain the original task ID to resume a slow job.
 

@@ -23,7 +23,7 @@ export class AceMusic implements INodeType {
     name: "aceMusic",
     icon: { light: "file:icon.png", dark: "file:icon.dark.png" },
     group: ["transform"],
-    version: 1,
+    version: [1, 1.1],
     subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
     description:
       "Create ACE Music songs and lyrics, then retrieve the same task through Ace Data Cloud",
@@ -56,6 +56,18 @@ export class AceMusic implements INodeType {
     const result: INodeExecutionData[] = [];
     for (let index = 0; index < items.length; index++) {
       try {
+        const additionalFields =
+          this.getNode().typeVersion >= 1.1
+            ? (this.getNodeParameter(
+                "additionalFields",
+                index,
+                {},
+              ) as IDataObject)
+            : null;
+        const optional = (name: string, fallback: string | number) =>
+          additionalFields
+            ? (additionalFields[name] ?? fallback)
+            : this.getNodeParameter(name, index, fallback);
         const resource = this.getNodeParameter("resource", index) as string;
         const operation = this.getNodeParameter("operation", index) as string;
         const simplify = this.getNodeParameter(
@@ -134,13 +146,9 @@ export class AceMusic implements INodeType {
                   this.getNodeParameter("prompt", index),
                   "Prompt",
                 ),
-                ...(String(
-                  this.getNodeParameter("lyricsStyle", index, ""),
-                ).trim()
+                ...(String(optional("lyricsStyle", "")).trim()
                   ? {
-                      style: String(
-                        this.getNodeParameter("lyricsStyle", index, ""),
-                      ).trim(),
+                      style: String(optional("lyricsStyle", "")).trim(),
                     }
                   : {}),
               },
@@ -172,7 +180,7 @@ export class AceMusic implements INodeType {
               ) as boolean;
               Object.assign(body, {
                 action: "generate",
-                model: this.getNodeParameter("model", index),
+                model: optional("model", "acemusic-v1.1"),
                 custom,
               });
               if (custom) {
@@ -202,20 +210,12 @@ export class AceMusic implements INodeType {
                   "A public HTTPS MP3 URL without credentials is required",
                 );
               Object.assign(body, { action: "upload", audio_url: audioUrl });
-              const name = String(
-                this.getNodeParameter("uploadName", index, ""),
-              ).trim();
-              const anchor = String(
-                this.getNodeParameter("anchorAudioId", index, ""),
-              ).trim();
+              const name = String(optional("uploadName", "")).trim();
+              const anchor = String(optional("anchorAudioId", "")).trim();
               if (name) body.name = name;
               if (anchor) body.audio_id = anchor;
             } else if (["cover", "mashup"].includes(operation)) {
-              const influence = this.getNodeParameter(
-                "audioInfluence",
-                index,
-                60,
-              ) as number;
+              const influence = optional("audioInfluence", 60) as number;
               if (
                 !Number.isFinite(influence) ||
                 influence < 1 ||
@@ -238,9 +238,7 @@ export class AceMusic implements INodeType {
                 ),
                 audio_influence: influence,
               });
-              const title = String(
-                this.getNodeParameter("referenceTitle", index, ""),
-              ).trim();
+              const title = String(optional("referenceTitle", "")).trim();
               if (title) body.title = title;
               if (operation === "cover")
                 body.audio_id = requiredText(

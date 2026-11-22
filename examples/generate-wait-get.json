@@ -14,14 +14,16 @@
         "resource": "audio",
         "operation": "create",
         "prompt": "A warm acoustic folk song about returning home",
-        "model": "acemusic-v1.1",
         "custom": false,
-        "simplify": true
+        "simplify": true,
+        "additionalFields": {
+          "model": "acemusic-v1.1"
+        }
       },
       "id": "create",
       "name": "Create once",
       "type": "@acedatacloud/n8n-nodes-acemusic.aceMusic",
-      "typeVersion": 1,
+      "typeVersion": 1.1,
       "position": [240, 0]
     },
     {
@@ -46,7 +48,7 @@
       "id": "get",
       "name": "Get original task",
       "type": "@acedatacloud/n8n-nodes-acemusic.aceMusic",
-      "typeVersion": 1,
+      "typeVersion": 1.1,
       "position": [720, 0]
     },
     {

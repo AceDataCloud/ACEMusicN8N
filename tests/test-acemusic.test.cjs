@@ -5,7 +5,7 @@ const { taskResult } = require("../dist/nodes/AceMusic/helpers.js");
 const {
   AceDataAceMusicApi,
 } = require("../dist/credentials/AceDataAceMusicApi.credentials.js");
-function context(parameters, response) {
+function context(parameters, response, typeVersion = 1) {
   const calls = [];
   const ctx = {
     getInputData: () => [{ json: {} }],
@@ -13,7 +13,7 @@ function context(parameters, response) {
     getNode: () => ({
       name: "ACE Music",
       type: "aceMusic",
-      typeVersion: 1,
+      typeVersion,
       position: [0, 0],
     }),
     continueOnFail: () => false,
@@ -291,4 +291,94 @@ test("invalid references never submit any request", async () => {
     await assert.rejects(new AceMusic().execute.call(ctx));
     assert.equal(calls.length, 0);
   }
+});
+
+test("new nodes use default model without requiring an optional field", async () => {
+  const { ctx, calls } = context(
+    { resource: "audio", operation: "create", prompt: "Warm folk song" },
+    { task_id: "one" },
+    1.1,
+  );
+  await new AceMusic().execute.call(ctx);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].body.model, "acemusic-v1.1");
+});
+
+test("new Additional Fields preserve the legacy API payloads", async () => {
+  const cases = [
+    [
+      { resource: "audio", operation: "create", prompt: "Warm folk song" },
+      { model: "acemusic-v1" },
+    ],
+    [
+      { resource: "lyrics", operation: "create", prompt: "Home" },
+      { lyricsStyle: "Folk" },
+    ],
+    [
+      {
+        resource: "audio",
+        operation: "upload",
+        audioUrl: "https://example.com/owned.mp3",
+      },
+      { uploadName: "Original", anchorAudioId: "anchor-one" },
+    ],
+    [
+      {
+        resource: "audio",
+        operation: "cover",
+        audioId: "audio-one",
+        referenceLyric: "Home",
+        referenceStyle: "Folk",
+      },
+      { referenceTitle: "Home", audioInfluence: 75 },
+    ],
+  ];
+  for (const [required, options] of cases) {
+    const oldNode = context({ ...required, ...options }, { task_id: "one" });
+    const newNode = context(
+      { ...required, additionalFields: options },
+      { task_id: "one" },
+      1.1,
+    );
+    await new AceMusic().execute.call(oldNode.ctx);
+    await new AceMusic().execute.call(newNode.ctx);
+    assert.deepEqual(newNode.calls, oldNode.calls);
+  }
+});
+
+test("n8n displays optional fields in the collection only on new nodes", () => {
+  const { NodeHelpers } = require("n8n-workflow");
+  const description = new AceMusic().description;
+  const values = { resource: "audio", operation: "create", custom: false };
+  const visible = (typeVersion) =>
+    description.properties
+      .filter((field) =>
+        NodeHelpers.displayParameter(
+          values,
+          field,
+          { typeVersion },
+          description,
+        ),
+      )
+      .map((field) => field.name);
+  assert.equal(visible(1).includes("model"), true);
+  assert.equal(visible(1).includes("additionalFields"), false);
+  assert.equal(visible(1.1).includes("model"), false);
+  assert.equal(visible(1.1).includes("additionalFields"), true);
+  const collection = description.properties.find(
+    (field) => field.name === "additionalFields",
+  );
+  const shown = collection.options.filter((field) =>
+    NodeHelpers.displayParameter(
+      {},
+      field,
+      { typeVersion: 1.1 },
+      description,
+      values,
+    ),
+  );
+  assert.deepEqual(
+    shown.map((field) => field.name),
+    ["model"],
+  );
 });

@@ -1,6 +1,6 @@
 import type { INodeProperties } from "n8n-workflow";
 
-export const properties: INodeProperties[] = [
+const fields: INodeProperties[] = [
   {
     displayName: "Resource",
     name: "resource",
@@ -329,5 +329,50 @@ export const properties: INodeProperties[] = [
     type: "boolean",
     default: true,
     description: "Whether to return a simplified response instead of raw data",
+  },
+];
+
+const optionalNames = new Set([
+  "model",
+  "lyricsStyle",
+  "uploadName",
+  "anchorAudioId",
+  "referenceTitle",
+  "audioInfluence",
+]);
+
+export const properties: INodeProperties[] = [
+  ...fields.map((field) =>
+    optionalNames.has(field.name)
+      ? {
+          ...field,
+          displayOptions: {
+            show: { ...field.displayOptions?.show, "@version": [1] },
+          },
+        }
+      : field,
+  ),
+  {
+    displayName: "Additional Fields",
+    name: "additionalFields",
+    type: "collection",
+    placeholder: "Add Field",
+    default: {},
+    displayOptions: {
+      show: { "@version": [1.1], resource: ["audio", "lyrics"] },
+    },
+    options: fields
+      .filter((field) => optionalNames.has(field.name))
+      .map((field) => ({
+        ...field,
+        displayOptions: {
+          show: Object.fromEntries(
+            Object.entries(field.displayOptions?.show ?? {}).map(
+              ([key, value]) => [`/${key}`, value],
+            ),
+          ),
+        },
+      }))
+      .sort((left, right) => left.displayName.localeCompare(right.displayName)),
   },
 ];
