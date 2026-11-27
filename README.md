@@ -8,7 +8,7 @@ In a self-hosted n8n instance, open **Settings → Community Nodes → Install**
 
 ## Credentials
 
-Acquire ACE Music or an authorized global application at [Ace Data Cloud](https://platform.acedata.cloud/console/applications). Paste the API token without the Bearer prefix. The credential test only queries one task page and creates no music.
+Acquire ACE Music or an authorized global application at [Ace Data Cloud](https://platform.acedata.cloud/console/applications?utm_source=npm&utm_medium=referral&utm_campaign=evergreen). Paste the API token without the Bearer prefix. The credential test only queries one task page and creates no music.
 
 ## Use the node
 
@@ -30,7 +30,7 @@ npm test
 npm pack --dry-run
 ```
 
-See [API documentation](https://platform.acedata.cloud/documents/acemusic) and [current pricing](https://platform.acedata.cloud/models). Installation is free; generation, lyric creation and audio uploads use the application balance.
+See [API documentation](https://platform.acedata.cloud/documents/acemusic?utm_source=npm&utm_medium=referral&utm_campaign=evergreen) and [current pricing](https://platform.acedata.cloud/models?utm_source=npm&utm_medium=referral&utm_campaign=evergreen). Installation is free; generation, lyric creation and audio uploads use the application balance.
 
 Import [the submit → Wait → get-original-task example](examples/generate-wait-get.json), set the ACE Music credential on both ACE Music nodes, and leave the Create node's automatic retry disabled. The pending branch loops only through Wait and Get. The example has a 15-minute execution timeout; retain the original task ID to resume a slow job.
 
