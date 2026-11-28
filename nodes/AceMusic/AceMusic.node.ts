@@ -19,7 +19,7 @@ import { properties } from "./properties";
 
 export class AceMusic implements INodeType {
   description: INodeTypeDescription = {
-    displayName: "ACE Music by Ace Data Cloud",
+    displayName: "ACE Music",
     name: "aceMusic",
     icon: { light: "file:icon.png", dark: "file:icon.dark.png" },
     group: ["transform"],
@@ -27,7 +27,7 @@ export class AceMusic implements INodeType {
     subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
     description:
       "Create ACE Music songs and lyrics, then retrieve the same task through Ace Data Cloud",
-    defaults: { name: "ACE Music by Ace Data Cloud" },
+    defaults: { name: "ACE Music" },
     inputs: [NodeConnectionTypes.Main],
     outputs: [NodeConnectionTypes.Main],
     usableAsTool: true,

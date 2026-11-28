@@ -7,7 +7,7 @@ import type {
 
 export class AceDataAceMusicApi implements ICredentialType {
   name = "aceDataAceMusicApi";
-  displayName = "ACE Music by Ace Data Cloud API";
+  displayName = "ACE Music API";
   documentationUrl = "https://github.com/AceDataCloud/ACEMusicN8N#credentials";
   icon = "file:../nodes/AceMusic/icon.png" as const;
   properties: INodeProperties[] = [
