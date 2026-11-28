@@ -8,9 +8,9 @@ In a self-hosted n8n instance, open **Settings → Community Nodes → Install**
 
 ## Credentials
 
-Sign in to [Applications](https://platform.acedata.cloud/console/applications?utm_source=npm&utm_medium=referral&utm_campaign=evergreen) and open **General Application**. If it is missing, select **Initialize General Application**. Click the copy button marked **1** beside **API KEY**.
+Sign in to [Applications](https://platform.acedata.cloud/console/applications?utm_source=npm&utm_medium=referral&utm_campaign=evergreen) and open **General Application**. If it is missing, select **Initialize General Application**. Click the copy button to the right of **API KEY**.
 
-![Copy the General Application API key with the button marked 1](https://raw.githubusercontent.com/AceDataCloud/NanoBananaDify/2522b2f57210597af2db866445319334a1677a23/_assets/tutorial/get-api-key-en.png)
+![Copy the API key from General Application](https://cdn.acedata.cloud/dvc3cg.jpg)
 
 Confirm the key can access ACE Music. In n8n, paste its raw value into **API Token** in the **ACE Music API** credential. n8n adds the `Bearer` prefix for you. The credential test queries a task page and creates no music.
 
