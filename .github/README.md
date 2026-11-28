@@ -1,6 +1,6 @@
 <!-- Generated from README.md by AceDataCloud/Index plans/plugin-readme-audit/render_channel_readmes.py. -->
 
-# ACE Music by Ace Data Cloud for n8n
+# ACE Music for n8n
 
 Create songs from an idea or custom lyrics, generate lyric drafts, and query the original task. This package integrates only the ACE Music API, maintained by Ace Data Cloud, using one node and one credential. It does not bundle other model services.
 

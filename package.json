@@ -1,6 +1,6 @@
 {
   "name": "@acedatacloud/n8n-nodes-acemusic",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Create ACE Music songs and lyrics, then retrieve the same task through Ace Data Cloud.",
   "license": "MIT",
   "homepage": "https://github.com/AceDataCloud/ACEMusicN8N",
